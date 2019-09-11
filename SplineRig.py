@@ -37,10 +37,6 @@ class splineIK():
         DATE:          02/07/19
         Version        1.0.0
 
-        EXAMPLE: prp_seatbelt in kingdomforce season 1
-
-
-
         @todo
         VControl replacement
         :type rotateControl: the ordation axis and then rotation degrees    Ex.{"r":45}
