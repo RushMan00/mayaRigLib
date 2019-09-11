@@ -1,0 +1,91 @@
+def geoToNurbStrip(name = "name",
+                   side = "side",
+                   geo = 'g_belt_01_cn',
+                   cutMiddle =['g_belt_01_cn1.e[74]'],
+                   makeCurves = {1:[u'g_belt_01_cn1.e[0:29]', u'g_belt_01_cn1.e[31:36]', u'g_belt_01_cn1.e[38:39]'],
+                                 2:[u'g_belt_01_cn1.e[40]', u'g_belt_01_cn1.e[42:43]', u'g_belt_01_cn1.e[45:46]'],
+                                }
+                   ):
+    #du
+    dupGeo = cmds.duplicate(geo, n = 'copy_'+geo)
+    cmds.select(dupGeo)
+    # cut Middle First
+    cmds.polySplitEdge(cutMiddle)
+    # make curve on geo
+    crvNames = []
+    for i in range(len(makeCurves)):
+        cmds.select(makeCurves[i+1])
+        cmds.polyToCurve(form=3,degree=1)
+        cName = cmds.rename('crv_{0}_{1}_{2}'.format(name,i+1,side))
+        crvNames.append(cName)
+    # loft the curves
+    lofted = cmds.loft( crvNames[0], crvNames[1], ch=False, rn=True, ar=True, name ='nurb_{0}_{1}'.format(name, side))
+    cmds.delete(dupGeo)
+    cmds.delete(crvNames[0])
+    cmds.delete(crvNames[1])
+    
+    cmds.reverseSurface('nurb_name_side', d=3, ch=1 ,rpo=1)
+    
+    
+    
+# attach joint to 
+
+geoToNurbStrip(name = "name",
+               side = "side",
+               geo = 'g_belt_01_cn',
+               cutMiddle =[u'g_belt_01_cn.e[86]', u'g_belt_01_cn.e[256]', u'g_belt_01_cn.e[258:259]', u'g_belt_01_cn.e[355]', 
+                           u'g_belt_01_cn.e[431]', u'g_belt_01_cn.e[479]', u'g_belt_01_cn.e[555]', u'g_belt_01_cn.e[633]', 
+                           u'g_belt_01_cn.e[709]', u'g_belt_01_cn.e[809]', u'g_belt_01_cn.e[885]', u'g_belt_01_cn.e[963]', 
+                           u'g_belt_01_cn.e[1013]'],
+                           
+               makeCurves = {1:[u'g_belt_01_cn.e[534]', u'g_belt_01_cn.e[536]', u'g_belt_01_cn.e[538]', u'g_belt_01_cn.e[540]', 
+                               u'g_belt_01_cn.e[542]', u'g_belt_01_cn.e[544]', u'g_belt_01_cn.e[546]', u'g_belt_01_cn.e[548]', 
+                               u'g_belt_01_cn.e[550]', u'g_belt_01_cn.e[552]', u'g_belt_01_cn.e[554]', u'g_belt_01_cn.e[556]', 
+                               u'g_belt_01_cn.e[558]', u'g_belt_01_cn.e[560]', u'g_belt_01_cn.e[562]', u'g_belt_01_cn.e[564]', 
+                               u'g_belt_01_cn.e[566]', u'g_belt_01_cn.e[568]', u'g_belt_01_cn.e[570]', u'g_belt_01_cn.e[572]', 
+                               u'g_belt_01_cn.e[574]', u'g_belt_01_cn.e[576]', u'g_belt_01_cn.e[578]', u'g_belt_01_cn.e[580]', 
+                               u'g_belt_01_cn.e[582]', u'g_belt_01_cn.e[584]', u'g_belt_01_cn.e[586]', u'g_belt_01_cn.e[588]', 
+                               u'g_belt_01_cn.e[590:591]', u'g_belt_01_cn.e[594]', u'g_belt_01_cn.e[596]', u'g_belt_01_cn.e[598]', 
+                               u'g_belt_01_cn.e[600]', u'g_belt_01_cn.e[602]', u'g_belt_01_cn.e[604]', u'g_belt_01_cn.e[606:607]', 
+                               u'g_belt_01_cn.e[1069]', u'g_belt_01_cn.e[1097]', u'g_belt_01_cn.e[1125]'],
+                                
+                             2:[u'g_belt_01_cn.e[762]', u'g_belt_01_cn.e[764]', u'g_belt_01_cn.e[766]', u'g_belt_01_cn.e[768]', 
+                               u'g_belt_01_cn.e[770]', u'g_belt_01_cn.e[772]', u'g_belt_01_cn.e[774:775]', u'g_belt_01_cn.e[778]', 
+                               u'g_belt_01_cn.e[780]', u'g_belt_01_cn.e[782]', u'g_belt_01_cn.e[784]', u'g_belt_01_cn.e[786]', 
+                               u'g_belt_01_cn.e[788]', u'g_belt_01_cn.e[790]', u'g_belt_01_cn.e[792]', u'g_belt_01_cn.e[794]', 
+                               u'g_belt_01_cn.e[796]', u'g_belt_01_cn.e[798]', u'g_belt_01_cn.e[800]', u'g_belt_01_cn.e[802]', 
+                               u'g_belt_01_cn.e[804]', u'g_belt_01_cn.e[806]', u'g_belt_01_cn.e[808]', u'g_belt_01_cn.e[810]', 
+                               u'g_belt_01_cn.e[812]', u'g_belt_01_cn.e[814]', u'g_belt_01_cn.e[816]', u'g_belt_01_cn.e[818]', 
+                               u'g_belt_01_cn.e[820]', u'g_belt_01_cn.e[822]', u'g_belt_01_cn.e[824]', u'g_belt_01_cn.e[826]', 
+                               u'g_belt_01_cn.e[828]', u'g_belt_01_cn.e[830]', u'g_belt_01_cn.e[832]', u'g_belt_01_cn.e[834:835]', 
+                               u'g_belt_01_cn.e[1085]', u'g_belt_01_cn.e[1113]', u'g_belt_01_cn.e[1141]'],
+                               }
+                )
+
+
+
+
+import maya.cmds as cmds
+objList = cmds.ls(selection=1)
+edgeNum = cmds.polyEvaluate(edge=1)
+edgeList = []
+i=0
+while i<edgeNum:
+    edgeList.append(i)
+    i+=1
+
+CurveList = []
+while edgeList:
+    usedEdgeList=cmds.polySelect(objList[0],edgeLoop=edgeList[0])
+    tmpCurveList=cmds.polyToCurve(form=3,degree=1)
+    cmds.matchTransform(tmpCurveList[0],objList[0],pivots=True)
+    CurveList.append(tmpCurveList[0])
+    for j in usedEdgeList:
+        if j in edgeList:
+            edgeList.remove(j)   
+
+for c in CurveList:
+    if (c!=CurveList[0]):
+        curveShapeList=cmds.pickWalk(c,direction="down",type="nodes")
+        cmds.parent(curveShapeList[0],CurveList[0],relative=True,shape=True)
+        cmds.delete(c)
