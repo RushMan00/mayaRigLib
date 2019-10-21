@@ -3,9 +3,6 @@ import maya.cmds as cmds
 # vtools
 from vtool.maya_lib import rigs
 
-#tony's tools
-import VControls as vCtrls
-
 '''
 
 splineIK setup
@@ -168,9 +165,9 @@ class splineIK():
         #if self.matchToRotation:
         rig.set_match_to_rotation(True)
         rig.set_create_sub_controls(True)
-        rig.set_sub_control_shape('circleGrabber')
+        rig.set_sub_control_shape('cube')
         rig.set_sub_control_size(self.control_size/2)
-        rig.set_sub_control_color(21)
+        rig.set_sub_control_color(16)
         rig.set_hide_sub_translates(False)
         rig.set_sub_visibility(True)
         rig.create()
@@ -321,3 +318,68 @@ class splineIK():
         self.__createControls()
         self.__createStretchy()
         self.__cleanUp()
+
+
+    # ---- TODO Add Twist ----
+    #### sub middle control setup ####
+
+    for nbr in range(1,30):
+        cmds.parent('jnt_strapTwist_{0}_C'.format(nbr), 'jnt_strap_{0}_C'.format(nbr))
+
+    # number of joints
+    start, end = 1, 29
+
+    allOdd = []
+    allEven = []
+    # iterating each number in list
+    for num in range(start, end + 1):
+        # checking condition
+        if num % 2 != 1:
+            allEven.append(num)
+        else:
+            allOdd.append(num)
+
+    for odd, even in zip(allOdd, allEven):
+        # create plusMinusAverage Translate
+        PMA_Translate = cmds.shadingNode('plusMinusAverage', asUtility=True,
+                                          name='PMA_Twist_Translate_{0}'.format(odd))
+        # attr connect
+        cmds.connectAttr(PMA_Translate + '.output3D', 'jnt_strapTwist_{0}_C.translate'.format(even))
+        # create plusMinusAverage Rotate
+        PMA_Rotate = cmds.shadingNode('plusMinusAverage', asUtility=True,
+                                       name='PMA_Twist_Rotate_{0}'.format(odd))
+        # attr connect
+        cmds.connectAttr(PMA_Rotate+'.output1D',  'jnt_strapTwist_{0}_C.rx'.format(even))
+
+        for i in [PMA_Translate, PMA_Rotate]:
+            cmds.setAttr(i+'.operation', 3)
+
+        cmds.connectAttr('jnt_strapTwist_{0}_C.t'.format(odd), PMA_Translate + '.input3D[0]')
+        cmds.connectAttr('jnt_strapTwist_{0}_C.rx'.format(odd), PMA_Rotate + '.input1D[0]')
+
+        # MAKE THE OTHER CONNNECTION WORK.
+        cmds.connectAttr('jnt_strapTwist_{0}_C.t'.format(odd+2), PMA_Translate + '.input3D[1]')
+        cmds.connectAttr('jnt_strapTwist_{0}_C.rx'.format(odd+2), PMA_Rotate + '.input1D[1]')
+
+    for item in allOdd:
+        rig = rigs.FkRig('sub_strapTwist', 'C')
+        rig.set_joints('jnt_strapTwist_%s_C' % item)
+        rig.set_control_size(1)
+        rig.set_control_shape('square')
+        # rig.set_control_color(14)
+        rig.set_match_to_rotation(True)
+        rig.set_control_parent('CNT_SUB_MAIN_SUB_1_C')
+        rig.create()
+        rig.delete_setup()
+
+    # # setup
+    for odd, nbr in zip(allOdd, range(1, 30)):
+        cmds.parentConstraint('jnt_strap_{0}_C'.format(odd),
+                              'driver_CNT_SUB_STRAPTWIST_{0}_C'.format(nbr),
+                              mo=True)
+
+    # # End of twist strap
+    #if hide 
+    for num in range(1,8):
+        cmds.setAttr ("CNT_STRAP_{0}_CShape.v".format(num), 0)
+        
