@@ -1,8 +1,17 @@
 
+# get curve points tool
 print '===== Copy ====='
-for i in range(0,41):
-    foo =  cmds.pointPosition('curve1.cv[{0}]'.format(i))
-    print str(tuple(foo))+ ','
+foo = cmds.ls(sl=True)[0]
+print foo
+for i in range(0, 8):
+    foo = cmds.pointPosition(foo + '.cv[{0}]'.format(i))
+    print str(tuple(foo)) + ','
+print '===== End ====='
+
+print '===== Copy ====='
+for i in range(0, 11):
+    foo = cmds.pointPosition('curve7.cv[{0}]'.format(i))
+    print str(tuple(foo)) + ','
 print '===== End ====='
 
 # pyramid
@@ -216,3 +225,67 @@ gear = cmds.curve(name='gear', r=False, d=1,  # k = True, a = True,
                       (-0.28551153326975515, 0.0, -0.9690877611484243),
                       (-0.02792703607711131, 0.0, -1.009885145746707),
                   ])
+
+
+def godControl(name='C_GOD_CNT',
+               addScale=True):
+    shapeLists = []
+    # create curves
+    star = cmds.curve(name='arrowGod', r=False, d=1,  # k = True, a = True,
+                      p=[
+                          (-0.24976468221459797, 0.0, -0.9990587288583922),
+                          (-0.24976468221459788, 0.0, -1.4985880932875884),
+                          (-0.49952936442919593, 0.0, -1.4985880932875884),
+                          (2.1411146302991436e-16, 0.0, -1.9981174577167844),
+                          (0.49952936442919627, 0.0, -1.4985880932875884),
+                          (0.24976468221459822, 0.0, -1.4985880932875884),
+                          (0.24976468221459813, 0.0, -0.9990587288583922),
+                      ])
+    shape = cmds.ls(star, dag=True, shapes=True)
+    cmds.rename(shape, 'arrowGodShape')
+    shapeLists.append(star)
+
+    qtCircle = cmds.curve(name='qtGodCircle', r=False, d=1,  # k = True, a = True,
+                          p=[
+                              (-0.24976468221459794, 0.0, -0.9990587288583922),
+                              (-0.2965919365798677, 0.0, -0.9923691210919251),
+                              (-0.38934121742579897, 0.0, -0.9714072366081247),
+                              (-0.5214958437504207, 0.0, -0.9181227244860435),
+                              (-0.6434452788151456, 0.0, -0.8443475612891649),
+                              (-0.7519928599396136, 0.0, -0.7519928599396138),
+                              (-0.8443475612891649, 0.0, -0.6434452788151456),
+                              (-0.9181227244860434, 0.0, -0.5214958437504208),
+                              (-0.9714072366081238, 0.0, -0.38934121742579925),
+                              (-0.9923691210919247, 0.0, -0.296591936579868),
+                              (-0.9990587288583918, 0.0, -0.24976468221459822),
+                          ])
+    shape = cmds.ls(qtCircle, dag=True, shapes=True)
+    cmds.rename(shape, 'qtGodCircleShape')
+    shapeLists.append(qtCircle)
+
+    # creating other shapes and placing them
+    count = 90
+    for i in range(1, 4):
+        starOther = cmds.duplicate(star, n=star + '{0}'.format(i))
+        shapeLists.append(starOther[0])
+        cmds.setAttr(starOther[0] + '.ry', count)
+        qtCircle = cmds.duplicate(qtCircle, n='qtGodCircle' + '{0}'.format(str(i)))  # wtf?
+        shapeLists.append(qtCircle[0])
+        cmds.setAttr(qtCircle[0] + '.ry', count)
+        for stuff in [starOther, qtCircle]:
+            cmds.makeIdentity(stuff, apply=True, translate=True, rotate=True, scale=True)
+        count += 90
+    # combining Shapes
+    mainName = cmds.group(em=True, n='C_GOD_CNT')
+    for shapeList in shapeLists:
+        cmds.parent(shapeList + 'Shape', mainName, s=True, r=True)
+    # clean up
+    cmds.delete(shapeLists)
+    # add Attrs
+    if addScale:
+        cmds.addAttr()
+
+
+godControl(name='C_acme_CNT')
+
+
