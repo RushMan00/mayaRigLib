@@ -1,3 +1,6 @@
+# make this in to class
+#split all the curve creation in to its own folder??? so it reads faster??
+
 
 # get curve points tool
 print '===== Copy ====='
@@ -289,3 +292,15 @@ def godControl(name='C_GOD_CNT',
 godControl(name='C_acme_CNT')
 
 
+def scaleCurve(controlCurve = 'curve1',
+               scale = 3):
+    """
+    to scale curve with out effecting int of scale
+    ex. scale xyz will always be 1
+    """
+    spans = mc.getAttr( controlCurve+'.spans' )
+    foo = cmds.ls('curve1.cv[0:%s]'%spans, fl = True)
+    cmds.scale( scale,scale,scale, foo ,a = True, ws = True)
+    
+scaleCurve(controlCurve = 'curve1',
+           scale = 3)
