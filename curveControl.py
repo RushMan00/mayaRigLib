@@ -3,19 +3,17 @@
 
 
 # get curve points tool
-print '===== Copy ====='
-foo = cmds.ls(sl=True)[0]
-print foo
-for i in range(0, 8):
-    foo = cmds.pointPosition(foo + '.cv[{0}]'.format(i))
-    print str(tuple(foo)) + ','
-print '===== End ====='
+def printVertPos(node=cmds.ls(sl=True)[0]):
+    print '===== Copy ====='
+    spans = mc.getAttr(node + '.spans')
+    nbr = cmds.ls('curve1.cv[0:%s]' %spans, fl=True)
+    print nbr
+    for i in nbr:
+        foo = cmds.pointPosition(i)
+        print str(tuple(foo)) + ','
+    print '===== End ====='
 
-print '===== Copy ====='
-for i in range(0, 11):
-    foo = cmds.pointPosition('curve7.cv[{0}]'.format(i))
-    print str(tuple(foo)) + ','
-print '===== End ====='
+printVertPos(node=cmds.ls(sl=True)[0])
 
 # pyramid
 cmds.curve(name='pyramid', r=False, d=1,  # k = True, a = True,
