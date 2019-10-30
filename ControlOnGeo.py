@@ -1,97 +1,56 @@
 import maya.cmds as cmds
 
-import VControls
-reload(VControls)
-
-'''
-
-to make controls on each geo
-without going though the structure process 
-
-Great tool if you have many objects that needs one control or COG
-
-Example in KingdomForce - prp_rock_Group
-
-'''
 
 def controlOnGeo(name='name',
                  side='C',
-                 controlShape = 'sphere',
-                 controlSize = 2,
+                 controlShape='sphere',
+                 controlSize=2,
                  geo=['geo'],
                  groundIt=False,
                  controlColour=20,
                  subControls=False,
-                 parentTo = 'CNT_SUB_GOD_2_C'):
-
+                 parentTo='CNT_SUB_GOD_2_C'):
+                     
     for num, lst in enumerate(geo, 1):
-        clust = cmds.cluster(lst, n = 'clust_{0}_{1}_{2}'.format(name, num, side))
-        loc = cmds.spaceLocator(n='guilds_{0}_{1}_{2}'.format(name, num, side))
+        clust = cmds.cluster(lst, n='clust_{0}_{1}_{2}'.format(name, num, side))
+        jnt = cmds.joint(n='jnt_{0}_{1}_{2}'.format(name, num, side))
 
-
-        cmds.parent(loc, 'guide')
-        parcon = cmds.parentConstraint(clust, loc)
-
-        # cleanup
-        cmds.delete(parcon)
-        cmds.delete(clust)
-
-        if groundIt:
-            cmds.select(loc)
-            cmds.move(0, y=True)
-
-        # creating
-        VControls.vControls(name=name,
-                            side=side,
-                            geo=[lst],
-                            guides=loc,
-                            controlShape=controlShape,
-                            controlSize=controlSize,
-                            subControls=subControls,
-                            controlColour=controlColour,
-                            parentTo=parentTo
-                            )
-
-#######################################################
-
-def controlOnGeo2(name='name',
-                  side='C',
-                  controlShape = 'sphere',
-                  controlSize = 2,
-                  geoList=['geo'],
-                  groundIt=False,
-                  controlColour=20,
-                  subControls=False,
-                  parentTo = 'CNT_SUB_GOD_2_C'):
-
-    for num, lst in enumerate(geoList, 1):
-        clust = cmds.cluster(lst, n = 'clust_{0}_{1}_{2}'.format(name, num, side))
-        loc = cmds.spaceLocator(n='guilds_{0}_{1}_{2}'.format(name, num, side))
-
-
-        cmds.parent(loc, 'guide')
-        parcon = cmds.parentConstraint(clust, loc)
+        cmds.parent(jnt, 'structure')
+        parcon = cmds.parentConstraint(clust, jnt)
 
         # cleanup
         cmds.delete(parcon)
         cmds.delete(clust)
 
         if groundIt:
-            cmds.select(loc)
+            cmds.select(jnt)
             cmds.move(0, y=True)
 
-        # creating
-        VControls.vControls(name=name,
-                            side=side,
-                            geo=[lst],
-                            guides=loc,
-                            controlShape=controlShape,
-                            controlSize=controlSize,
-                            subControls=subControls,
-                            controlColour=controlColour,
-                            parentTo=parentTo
-                            )
-
+        rig = rigs.FkRig(name, side)
+        rig.set_joints(jnt)
+        rig.set_control_size(controlSize)
+        rig.set_control_shape(controlShape)
+        rig.set_control_color(controlColour)
+        rig.set_create_sub_controls(subControls)
+        rig.create()
+        rig.set_control_parent(parentTo)
+        rig.delete_setup()
+        
+        
+        if subControls:
+            for subNames in ['CNT_SUB_{0}_{1}_C'.format(name.upper(), num),
+                             'CNT_SUB_{0}_SUB_{1}_C'.format(name.upper(), num)]:
+                attr.unlock_attributes(subNames,
+                                       attributes=['tx', 'ty', 'tz',
+                                                   'ry', 'rz', 'rx'],
+                                       only_keyable=False)
+                cmds.parentConstraint('CNT_SUB_{0}_SUB_{1}_C'.format(name.upper(), num),
+                                      lst, mo = True)                       
+        else:                               
+            cmds.parentConstraint('CNT_{0}_{1}_C'.format(name.upper(), num),
+                                  lst, mo = True)
+            
+#########################################################################################
 
 def jointChainOnGeo(name='treeB_leaf',
                     side='C',
