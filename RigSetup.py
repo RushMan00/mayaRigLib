@@ -1,3 +1,5 @@
+import maya.cmds as cmds
+
 def offsetGroup(node='C_GOD_CNT', hook=None,
                 groupNames=['xform', 'driver', 'offset', 'buffer']):
     """
